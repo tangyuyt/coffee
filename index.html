@@ -47,45 +47,39 @@
     }
     .input-row {
       display: flex;
-      flex-direction: column;
       gap: 8px;
       margin-bottom: 10px;
     }
     .input-group {
+      flex: 1;
+      background: #FAF7F4;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 6px;
     }
     .input-group label {
-      font-size: 13px;
+      font-size: 10px;
       color: #A1887F;
       font-weight: 500;
-      white-space: nowrap;
-      width: 52px;
-      text-align: right;
     }
     .input-group input {
-      flex: 1;
-      border: 2px solid #E8E0D9;
-      border-radius: 10px;
-      padding: 10px 8px;
-      font-size: 16px;
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 20px;
+      font-weight: 700;
       text-align: center;
       color: #3E2723;
-      background: #FAF7F4;
-      transition: border-color 0.2s;
+      padding: 4px 0;
       -webkit-appearance: none;
-      max-width: 120px;
-    }
-    .input-group input:focus {
       outline: none;
-      border-color: #6F4E37;
     }
     .unit {
-      font-size: 12px;
+      font-size: 10px;
       color: #A1887F;
-      white-space: nowrap;
-      width: 36px;
     }
     .btn-record {
       width: 100%;
@@ -189,17 +183,17 @@
       <div class="input-group">
         <label>研磨度</label>
         <input type="number" id="grind" placeholder="0" step="0.5" inputmode="decimal" onkeydown="nextInput(event, 'timeSec')">
-        <span class="unit">格</span>
+        <div class="unit">格</div>
       </div>
       <div class="input-group">
         <label>萃取时间</label>
         <input type="number" id="timeSec" placeholder="0" step="1" inputmode="numeric" onkeydown="nextInput(event, 'yield')">
-        <span class="unit">秒</span>
+        <div class="unit">秒</div>
       </div>
       <div class="input-group">
         <label>出液量</label>
         <input type="number" id="yield" placeholder="0" step="0.1" inputmode="decimal" onkeydown="nextInput(event, 'recordBtn')">
-        <span class="unit">克</span>
+        <div class="unit">克</div>
       </div>
     </div>
     <button class="btn-record" id="recordBtn" onclick="addRecord()">记 录</button>
