@@ -1,4 +1,4 @@
-const CACHE = 'coffee-pwa-v2';
+const CACHE = 'coffee-pwa-v3';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
