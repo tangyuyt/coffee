@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>咖啡萃取记录</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6F4E37">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #F5F0EB;
+      color: #3E2723;
+      min-height: 100vh;
+      padding-bottom: 20px;
+    }
+    .header {
+      background: #6F4E37;
+      color: #fff;
+      padding: 16px 20px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header span { font-size: 28px; }
+    .card {
+      background: #fff;
+      margin: 16px;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .card-title {
+      font-size: 14px;
+      color: #8D6E63;
+      margin-bottom: 16px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .input-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .input-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .input-group label {
+      font-size: 12px;
+      color: #A1887F;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .input-group input {
+      border: 2px solid #E8E0D9;
+      border-radius: 12px;
+      padding: 14px 12px;
+      font-size: 18px;
+      text-align: center;
+      color: #3E2723;
+      background: #FAF7F4;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .input-group input:focus {
+      outline: none;
+      border-color: #6F4E37;
+    }
+    .unit {
+      font-size: 12px;
+      color: #A1887F;
+      text-align: center;
+      margin-top: 2px;
+    }
+    .btn-record {
+      width: 100%;
+      background: #6F4E37;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.2s;
+      margin-top: 4px;
+    }
+    .btn-record:active {
+      transform: scale(0.97);
+      background: #5D3D2A;
+    }
+    .btn-reset {
+      width: 100%;
+      background: none;
+      color: #A1887F;
+      border: 2px solid #E8E0D9;
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 14px;
+      margin-top: 8px;
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      background: #6F4E37;
+      color: #fff;
+      padding: 10px 6px;
+      font-weight: 500;
+      font-size: 11px;
+      letter-spacing: 1px;
+      position: sticky;
+      top: 56px;
+      z-index: 5;
+    }
+    tbody td {
+      padding: 10px 6px;
+      text-align: center;
+      border-bottom: 1px solid #E8E0D9;
+    }
+    .result-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .badge-coarse { background: #FFF3E0; color: #E65100; }
+    .badge-fine   { background: #E8EAF6; color: #283593; }
+    .badge-good   { background: #E8F5E9; color: #2E7D32; }
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #BCAAA4;
+    }
+    .empty-state .icon { font-size: 48px; }
+    .empty-state p { margin-top: 8px; font-size: 14px; }
+    .stats {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .stat-item {
+      flex: 1;
+      background: #FAF7F4;
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 24px;
+      font-weight: 700;
+      color: #6F4E37;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: #A1887F;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header"><span>☕</span> 咖啡萃取记录</div>
+
+  <div class="card">
+    <div class="card-title">📝 记录参数</div>
+    <div class="input-row">
+      <div class="input-group">
+        <label>研磨度</label>
+        <input type="number" id="grind" placeholder="0" step="0.5" inputmode="decimal">
+        <div class="unit">格</div>
+      </div>
+      <div class="input-group">
+        <label>萃取时间</label>
+        <input type="number" id="timeSec" placeholder="0" step="1" inputmode="numeric">
+        <div class="unit">秒 (s)</div>
+      </div>
+      <div class="input-group">
+        <label>出液量</label>
+        <input type="number" id="yield" placeholder="0" step="0.1" inputmode="decimal">
+        <div class="unit">克 (g)</div>
+      </div>
+    </div>
+    <button class="btn-record" onclick="addRecord()">记 录</button>
+  </div>
+
+  <div class="card" id="resultCard">
+    <div class="card-title">📊 历史记录</div>
+    <div class="stats" id="stats"></div>
+    <div id="tableWrap"></div>
+  </div>
+
+  <div style="text-align:center;padding:8px;">
+    <button class="btn-reset" onclick="clearAll()" style="width:auto;padding:10px 30px;">🗑 清空记录</button>
+  </div>
+
+<script>
+function getResult(timeSec, yieldG) {
+  const t = Number(timeSec);
+  const y = Number(yieldG);
+  if (isNaN(t) || isNaN(y)) return ["-", ""];
+  /* 时间和出液都在标准区间 */
+  if (t >= 25 && t <= 30 && y >= 34 && y <= 38) return ["完美咖啡", "badge-good"];
+  /* 时间偏离：主判断标准 */
+  if (t < 25) return ["调细", "badge-fine"];
+  if (t > 30) return ["调粗", "badge-coarse"];
+  /* 时间达标但出液偏离 */
+  if (y < 34) return ["调粗", "badge-coarse"];
+  if (y > 38) return ["调细", "badge-fine"];
+  return ["-", ""];
+}
+
+function loadRecords() {
+  try { return JSON.parse(localStorage.getItem('coffee_records') || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveRecords(records) {
+  localStorage.setItem('coffee_records', JSON.stringify(records.slice(-200)));
+}
+
+function addRecord() {
+  const grind = document.getElementById('grind').value || '0';
+  const timeSec = document.getElementById('timeSec').value || '0';
+  const yieldG = document.getElementById('yield').value || '0';
+
+  const now = new Date();
+  const timeStr = now.getFullYear() + '-' +
+    String(now.getMonth()+1).padStart(2,'0') + '-' +
+    String(now.getDate()).padStart(2,'0') + ' ' +
+    String(now.getHours()).padStart(2,'0') + ':' +
+    String(now.getMinutes()).padStart(2,'0');
+
+  const [result, cls] = getResult(timeSec, yieldG);
+
+  const record = { time: timeStr, grind, timeSec, yield: yieldG, result, cls };
+  const records = loadRecords();
+  records.push(record);
+  saveRecords(records);
+
+  // Clear inputs
+  document.getElementById('grind').value = '';
+  document.getElementById('timeSec').value = '';
+  document.getElementById('yield').value = '';
+  document.getElementById('grind').focus();
+
+  render();
+}
+
+function clearAll() {
+  if (confirm('确定要清空所有记录吗？')) {
+    localStorage.removeItem('coffee_records');
+    render();
+  }
+}
+
+function render() {
+  const records = loadRecords();
+  const wrap = document.getElementById('tableWrap');
+  const statsEl = document.getElementById('stats');
+
+  if (records.length === 0) {
+    statsEl.innerHTML = '';
+    wrap.innerHTML = '<div class="empty-state"><div class="icon">☕</div><p>还没有记录，开始记录你的第一杯咖啡吧～</p></div>';
+    return;
+  }
+
+  // Stats
+  const total = records.length;
+  const goods = records.filter(r => r.result === '完美咖啡').length;
+  const rate = total > 0 ? Math.round(goods / total * 100) : 0;
+  statsEl.innerHTML =
+    '<div class="stat-item"><div class="stat-num">' + total + '</div><div class="stat-label">总次数</div></div>' +
+    '<div class="stat-item"><div class="stat-num">' + goods + '</div><div class="stat-label">完美咖啡</div></div>' +
+    '<div class="stat-item"><div class="stat-num">' + rate + '%</div><div class="stat-label">成功率</div></div>';
+
+  // Table
+  let html = '<table><thead><tr><th>时间</th><th>研磨度</th><th>时间(s)</th><th>出液(g)</th><th>结果</th></tr></thead><tbody>';
+  const reversed = [...records].reverse();
+  for (const r of reversed) {
+    html += '<tr>' +
+      '<td>' + r.time + '</td>' +
+      '<td>' + r.grind + '</td>' +
+      '<td>' + r.timeSec + '</td>' +
+      '<td>' + r.yield + '</td>' +
+      '<td><span class="result-badge ' + r.cls + '">' + r.result + '</span></td>' +
+      '</tr>';
+  }
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+// Init
+render();
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+</body>
+</html>
